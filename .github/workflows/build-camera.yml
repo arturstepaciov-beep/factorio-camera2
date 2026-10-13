@@ -1,0 +1,56 @@
+name: Build camera test DLL
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Download original source
+        uses: actions/checkout@v4
+        with:
+          repository: GDani31/factorio-3d-mod
+          ref: 9da9769c2a9c6eb3f2fba4ebebb6d3d718df0e01
+          persist-credentials: false
+      - name: Apply camera adjustments
+        shell: python {0}
+        run: |
+          import base64, pathlib, subprocess
+          patch = pathlib.Path("camera-test.patch")
+          patch.write_bytes(base64.b64decode("ZGlmZiAtLWdpdCBhL2ZhY3RvcmlvXzNkX21vZGVscy9zcmMvaG9va3MvZnJhbWUucnMgYi9mYWN0b3Jpb18zZF9tb2RlbHMvc3JjL2hvb2tzL2ZyYW1lLnJzCmluZGV4IDFmYjQ4YWQuLmEzMmViMWEgMTAwNjQ0Ci0tLSBhL2ZhY3RvcmlvXzNkX21vZGVscy9zcmMvaG9va3MvZnJhbWUucnMKKysrIGIvZmFjdG9yaW9fM2RfbW9kZWxzL3NyYy9ob29rcy9mcmFtZS5ycwpAQCAtNDI0LDExICs0MjQsMTEgQEAgZm4gYm9vc3RlZF9jZW50ZXJfb24oCiAgICAgICAgIGlmIHpvb20uaXNfZmluaXRlKCkgJiYgem9vbSA+IDFlLTYgJiYgd19weCA+IDE2LjAgewogICAgICAgICAgICAgbGV0IHNwYW4gPSB3X3B4IC8gKHpvb20gKiBvZmZzZXRzOjpQWF9QRVJfVElMRV9TQ0FMRV8xKTsKICAgICAgICAgICAgIGxldCAoeWF3LCBwaXRjaCwgX3opID0gY3JhdGU6OmNhbWVyYTo6Z2V0KCk7Ci0gICAgICAgICAgICBsZXQgZW5nYWdlZCA9IHBpdGNoIDwgODkuMCB8fCB5YXcuYWJzKCkgPiAxLjA7CisgICAgICAgICAgICBsZXQgZW5nYWdlZCA9IGNyYXRlOjpjYW1lcmE6OmZwc19tb2RlKCkgfHwgcGl0Y2ggPCA4OS4wIHx8IHlhdy5hYnMoKSA+IDEuMDsKICAgICAgICAgICAgIGlmIGVuZ2FnZWQgewotICAgICAgICAgICAgICAgIGJvb3N0ID0gKHNldHRpbmdzOjpUQVJHRVRfU1BBTl9USUxFUyAvIHNwYW4pCisgICAgICAgICAgICAgICAgYm9vc3QgPSAoY3JhdGU6OnR1bmluZzo6VklFV19UQVJHRVRfU1BBTi5nZXQoKS5jbGFtcCg0MC4wLCAzMDAuMCkgYXMgZjY0IC8gc3BhbikKICAgICAgICAgICAgICAgICAgICAgLm1heCgxLjApCi0gICAgICAgICAgICAgICAgICAgIC5taW4oc2V0dGluZ3M6Ok1BWF9aT09NX0JPT1NUKQorICAgICAgICAgICAgICAgICAgICAubWluKGNyYXRlOjp0dW5pbmc6OlZJRVdfTUFYX0JPT1NULmdldCgpLmNsYW1wKDEuMCwgNi4wKSBhcyBmNjQpCiAgICAgICAgICAgICAgICAgICAgIC5taW4oKHNldHRpbmdzOjpNQVhfQk9PU1RfU1BBTl9USUxFUyAvIHNwYW4pLm1heCgxLjApKQogICAgICAgICAgICAgICAgICAgICAubWluKCh6b29tIC8gc2V0dGluZ3M6Ok1JTl9FRkZFQ1RJVkVfU0NBTEUpLm1heCgxLjApKTsKICAgICAgICAgICAgIH0KZGlmZiAtLWdpdCBhL2ZhY3RvcmlvXzNkX21vZGVscy9zcmMvcmVuZGVyZXIucnMgYi9mYWN0b3Jpb18zZF9tb2RlbHMvc3JjL3JlbmRlcmVyLnJzCmluZGV4IGNhNzMwYzIuLjY5NTI4ZTcgMTAwNjQ0Ci0tLSBhL2ZhY3RvcmlvXzNkX21vZGVscy9zcmMvcmVuZGVyZXIucnMKKysrIGIvZmFjdG9yaW9fM2RfbW9kZWxzL3NyYy9yZW5kZXJlci5ycwpAQCAtMTM1LDEwICsxMzUsMTMgQEAgaW1wbCBSZW5kZXJlcjNEIHsKICAgICAgICAgICAgICAgICB8fCAocGl0Y2ggLSA5MC4wKS5hYnMoKSA+IDEuMAogICAgICAgICAgICAgICAgIHx8ICh6b29tIC0gMS4wKS5hYnMoKSA+IDAuMDU7CiAKLSAgICAgICAgICAgIC8vIGZpcnN0LXBlcnNvbiBleWUgaGVpZ2h0OiAxLjcgdGlsZXMgaW4gcGxhbmUgdW5pdHMKKyAgICAgICAgICAgIC8vIEFkanVzdGFibGUgZmlyc3QtcGVyc29uIGV5ZSBoZWlnaHQsIGNvbnZlcnRlZCBmcm9tIHRpbGVzIHRvIHBsYW5lIHVuaXRzLgogICAgICAgICAgICAgbGV0IChfLCBfLCBfLCBzcGFuX3kpID0gY3JhdGU6Omhvb2tzOjpmcmFtZTo6dmlld19yZWN0X3RpbGVzKCk7CiAgICAgICAgICAgICBsZXQgZnBzX2V5ZV9oID0KLSAgICAgICAgICAgICAgICBpZiBzcGFuX3kgPiAwLjUgeyAxLjcgKiAyLjAgKiBwbGFuZV9zY2FsZSAvIHNwYW5feSB9IGVsc2UgeyAwLjA1IH07CisgICAgICAgICAgICAgICAgaWYgc3Bhbl95ID4gMC41IHsKKyAgICAgICAgICAgICAgICAgICAgY3JhdGU6OnR1bmluZzo6RlBTX0VZRV9IRUlHSFQuZ2V0KCkuY2xhbXAoMC4yLCAzLjApCisgICAgICAgICAgICAgICAgICAgICAgICAqIDIuMCAqIHBsYW5lX3NjYWxlIC8gc3Bhbl95CisgICAgICAgICAgICAgICAgfSBlbHNlIHsgMC4wNSB9OwogCiAgICAgICAgICAgICAvLyBhdCB5YXcgMCAvIHBpdGNoIDkwIC8gem9vbSAxIHRoaXMgaXMgZXhhY3RseSB0aGUgdmFuaWxsYSB2aWV3LAogICAgICAgICAgICAgLy8gc28gdGhlIHNhbWUgbWF0cml4IHNlcnZlcyB0aGUgd2FycCBBTkQgdGhlIGZsYXQgbW9kZWwgcGFzcwpkaWZmIC0tZ2l0IGEvZmFjdG9yaW9fM2RfbW9kZWxzL3NyYy90dW5pbmcucnMgYi9mYWN0b3Jpb18zZF9tb2RlbHMvc3JjL3R1bmluZy5ycwppbmRleCBkZjRjZmUxLi4xZjA3YzJkIDEwMDY0NAotLS0gYS9mYWN0b3Jpb18zZF9tb2RlbHMvc3JjL3R1bmluZy5ycworKysgYi9mYWN0b3Jpb18zZF9tb2RlbHMvc3JjL3R1bmluZy5ycwpAQCAtOTUsNiArOTUsMTIgQEAga25vYnMhIHsKICAgICAvLyB0cmFja19wYXRoLmpzb24gKHRoZSBjb252ZXlvciBwYXRoIHdyYXBzIGF0IHRoZSByZWFsIGxvb3AgbGVuZ3RoKQogICAgIFRBTktfVFJBQ0tfUEVSSU9EID0gMC4xNjk7IC8vIHRyZWFkIHJlcGVhdCBsZW5ndGggaW4gdGlsZXMgKHNjcm9sbCB3cmFwcyBoZXJlKQogCisgICAgLy8gRXhwZXJpbWVudGFsIGNhbWVyYSBjYWxpYnJhdGlvbjsgcmVsb2FkZWQgd2l0aCB0aGUgb3RoZXIgdHVuaW5nIGtub2JzLgorICAgIC8vIDAuODUgaXMgYSB0cmlhbCBleWUgaGVpZ2h0LCBub3QgYSBtZWFzdXJlZCBlbmdpbmVlciBoZWlnaHQuCisgICAgRlBTX0VZRV9IRUlHSFQgPSAwLjg1OyAvLyB0aWxlcywgYm91bmRlZCB0byAwLjIuLjMuMCBieSByZW5kZXJlcgorICAgIFZJRVdfVEFSR0VUX1NQQU4gPSAyMjAuMDsgLy8gdGlsZXMgYWNyb3NzLCBib3VuZGVkIHRvIDQwLi4zMDAKKyAgICBWSUVXX01BWF9CT09TVCA9IDQuMDsgLy8gYm91bmRlZCB0byAxLi42OyBlbmdpbmUgc2NhbGUgbGltaXQgc3RpbGwgYXBwbGllcworCiAgICAgLy8gLS0tIHRoZSBwbGF5ZXIgY2hhcmFjdGVyIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQogICAgIFBMQVlFUl9ZQVcgPSAxODAuMDsgICAgLy8gbWl4YW1vIHJpZyBmYWNpbmcgb2Zmc2V0IChzYW1lIGF1dGhvcmVkIGZhY2luZyBhcyBiaXRlcnMpCiAgICAgUExBWUVSX1NJWkUgPSAwLjY7ICAgICAvLyBtb2RlbCB4eiBleHRlbnQgZml0dGVkIHRvIHRoaXMgbWFueSB0aWxlcwpAQCAtMzAwLDYgKzMwNiw3IEBAIHB1YiBmbiBwb2xsKGZyYW1lOiB1NjQpIHsKICAgICAgICAgICAgICAgICAgICAgY29udGludWU7CiAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgIGxldCBPayh2YWwpID0gdi5wYXJzZTo6PGYzMj4oKSBlbHNlIHsgY29udGludWUgfTsKKyAgICAgICAgICAgICAgICBpZiAhdmFsLmlzX2Zpbml0ZSgpIHsgY29udGludWU7IH0KICAgICAgICAgICAgICAgICAvLyAieWF3Ojxtb2RlbC1uYW1lPj1kZWciIC0+IHBlci1tb2RlbCBvdmVycmlkZQogICAgICAgICAgICAgICAgIGlmIGxldCBTb21lKG5hbWUpID0gay5zdHJpcF9wcmVmaXgoInlhdzoiKSB7CiAgICAgICAgICAgICAgICAgICAgIG1vZGVsX3lhd3MucHVzaCgobmFtZS50cmltKCkudG9fc3RyaW5nKCksIHZhbCkpOwo="))
+          subprocess.run(["git", "apply", "--check", str(patch)], check=True)
+          subprocess.run(["git", "apply", str(patch)], check=True)
+      - name: Build Windows DLL
+        shell: pwsh
+        run: cargo build --release --locked -p factorio_3d_models
+      - name: Package test settings
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory camera-test | Out-Null
+          Copy-Item target/release/factorio_3d_models.dll camera-test/
+          @'
+          Experimental camera test for Factorio 2.0.77. Not tested in-game.
+          Close Factorio before replacing any files.
+          Back up your existing factorio_3d_models.dll, then replace it with this DLL.
+          Keep your existing injector and models folder.
+          In your EXISTING f3dm_tuning.txt, add or update these lines:
+          fps_eye_height=0.85
+          view_target_span=220
+          view_max_boost=4
+          Run Factorio and the injector as before.
+          Settings reload while playing. Try fps_eye_height=0.5 or 1.2 to calibrate.
+          0.85 is a trial value, not a confirmed correct height.
+          Engine zoom limits may prevent reaching the requested terrain coverage.
+          Higher coverage can reduce performance and terrain sharpness.
+          This does not change the player model or add unlimited render distance.
+          To revert: close Factorio and restore the backed-up DLL.
+          Source: GDani31/factorio-3d-mod commit 9da9769c2a9c6eb3f2fba4ebebb6d3d718df0e01
+          '@ | Set-Content camera-test/READ-ME.txt
+      - name: Upload DLL and instructions
+        uses: actions/upload-artifact@v4
+        with:
+          name: Factorio-camera-test
+          path: camera-test/
+          if-no-files-found: error
